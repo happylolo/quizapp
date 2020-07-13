@@ -207,7 +207,7 @@ class App extends React.Component {
       <div id="MasterForm">
         <h1>Check Out Form</h1>
         <p> Step {this.state.currentStep} </p>
-        <Countdown date={Date.now() + 5000} renderer={this.renderer}></Countdown>
+        <Countdown date={Date.now() + 180000} renderer={this.renderer}></Countdown>
         <br></br>
         <form onSubmit={this.handleSubmit}>
           <F1
