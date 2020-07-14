@@ -5,6 +5,7 @@ Go to `frontend`, run:
 * `npm run build`
 
 Go to `backend`, run:
+* `npm install -g nodemon`
 * `npm install`
 * `mongod` to start the MongoDB server if necessary
 * `npm start`
