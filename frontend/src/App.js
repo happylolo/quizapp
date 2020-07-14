@@ -255,7 +255,7 @@ class App extends React.Component {
   render() {
     return (
       <div id="MasterForm">
-        <h1>Check Out Form</h1>
+        <h1>Survey Form</h1>
         <p> Step {this.state.currentStep} </p>
         <div>
           Time Left: {this.state.time.m}: {this.state.time.s}
