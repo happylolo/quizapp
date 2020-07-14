@@ -1,8 +1,5 @@
-import Countdown from 'react-countdown';
 import React from 'react';
 import $ from 'jquery';
-
-const Completionist = () => <span>You are good to go!</span>;
 
 class F1 extends React.Component {
   render() {
@@ -147,11 +144,28 @@ class F6 extends React.Component {
   }
 }
 
+class F7 extends React.Component {
+  render() {
+    if (this.props.currentStep !== 7) {
+      return null;
+    }
+    return (
+      <p>Thank you! </p>
+    )
+  }
+}
+
 class App extends React.Component {
   constructor(props) {
     super(props);
     this._next = this._next.bind(this);
     this._prev = this._prev.bind(this);
+    this.startTimer = this.startTimer.bind(this);
+    this.countDown = this.countDown.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.timer = 0;
+    this.initialTime = 180;
     this.state = {
       currentStep: 1,
       email: '',
@@ -159,19 +173,54 @@ class App extends React.Component {
       answer2: '',
       answer3: '',
       answer4: '',
-      answer5: ''
+      answer5: '',
+      time: {},
+      seconds: this.initialTime
     };
+  }
 
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
+  secondsToTime(secs) {
+    let hours = Math.floor(secs / (60 * 60));
 
-    this.renderer = ({ hours, minutes, seconds, completed }) => {
-      if (completed) {
-        return <Completionist />;
-      } else {
-        return <span>{hours}:{minutes}:{seconds}</span>;
-      }
+    let divisor_for_minutes = secs % (60 * 60);
+    let minutes = Math.floor(divisor_for_minutes / 60);
+
+    let divisor_for_seconds = divisor_for_minutes % 60;
+    let seconds = Math.ceil(divisor_for_seconds);
+
+    let obj = {
+      "h": hours,
+      "m": minutes,
+      "s": seconds
     };
+    return obj;
+  };
+
+
+  componentDidMount() {
+    let timeLeftVar = this.secondsToTime(this.state.seconds);
+    this.setState({ time: timeLeftVar });
+    this.startTimer();
+  }
+
+  startTimer() {
+    if (this.timer === 0 && this.state.seconds > 0) {
+      this.timer = setInterval(this.countDown, 1000);
+    }
+  }
+
+  countDown() {
+    let seconds = this.state.seconds - 1;
+    this.setState({
+      time: this.secondsToTime(seconds),
+      seconds: seconds,
+    });
+
+    if (seconds === 0) {
+      clearInterval(this.timer);
+      this.timer = 0;
+      this._next();
+    }
   }
 
   handleChange(event) {
@@ -195,6 +244,7 @@ class App extends React.Component {
       }),
       success: (data) => {
         alert('Submission succeeded');
+        this._next();
       },
       error: (err) => {
         console.log(err);
@@ -207,7 +257,9 @@ class App extends React.Component {
       <div id="MasterForm">
         <h1>Check Out Form</h1>
         <p> Step {this.state.currentStep} </p>
-        <Countdown date={Date.now() + 180000} renderer={this.renderer}></Countdown>
+        <div>
+          Time Left: {this.state.time.m}: {this.state.time.s}
+        </div>
         <br></br>
         <form onSubmit={this.handleSubmit}>
           <F1
@@ -240,6 +292,9 @@ class App extends React.Component {
             handleChange={this.handleChange}
             answer5={this.state.answer5}
           />
+          <F7
+            currentStep={this.state.currentStep}
+          />
           {this.previousButton}
           {this.nextButton}
           {this.submitButton}
@@ -250,18 +305,34 @@ class App extends React.Component {
 
   _next() {
     let currentStep = this.state.currentStep;
-    currentStep = currentStep >= 5 ? 6 : currentStep + 1;
-    this.setState({
-      currentStep: currentStep
-    });
+    currentStep = currentStep >= 6 ? 7 : currentStep + 1;
+    if (currentStep !== 7) {
+      this.setState({
+        currentStep: currentStep,
+        time: this.secondsToTime(this.initialTime),
+        seconds: this.initialTime,
+      });
+      this.startTimer();
+    } else {
+      this.setState({
+        currentStep: currentStep,
+        time: this.secondsToTime(0),
+        seconds: 0,
+      });
+      clearInterval(this.timer);
+      this.timer = 0;
+    }
   }
 
   _prev() {
     let currentStep = this.state.currentStep;
     currentStep = currentStep <= 1 ? 1 : currentStep - 1;
     this.setState({
-      currentStep: currentStep
+      currentStep: currentStep,
+      time:this.secondsToTime(this.initialTime),
+      seconds: this.initialTime,
     });
+    this.startTimer();
   }
 
   get previousButton() {
@@ -301,6 +372,8 @@ class App extends React.Component {
         <input type="submit" value="Submit" />
       );
     }
+
+    return null;
   }
 }
 
