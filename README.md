@@ -1,4 +1,4 @@
-To build the application locally, make sure you have `node`, `mongodb` installed in your local env:
+To build the application locally, make sure you have the latest version of `node` 14 and `mongodb` installed in your local env:
 
 Go to `frontend`, run:
 * `npm install`
